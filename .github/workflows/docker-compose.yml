@@ -1,10 +1,26 @@
-version: "3.9"
+name: Build & Push with Docker Compose
 
-services:
-  web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: faiznurullah5/uas-test-saja:latest
-    ports:
-      - "9090:80"
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build image using Docker Compose
+        run: docker compose build
+
+      - name: Push image to Docker Hub
+        run: docker compose push
